@@ -24,6 +24,27 @@ class Conversation < ActiveRecord::Base
     )
   end
 
+  def self.search_string(query)
+    __elasticsearch__.search(
+      {
+        query: {
+          query_string: {
+            fields: ['state^5', 'body'],
+            query: query
+          }
+        },
+        highlight: {
+          pre_tags: ['<em>'],
+          post_tags: ['</em>'],
+          fields: {
+            state: {},
+            body:  {}
+          }
+        }
+      }
+    )
+  end
+
   settings index: { number_of_shards: 1 } do
     mappings dynamic: 'false' do
       indexes :state, analyzer: 'english'
@@ -45,11 +66,11 @@ class Conversation < ActiveRecord::Base
 end
 
   # Delete the previous articles index in Elasticsearch
-  Conversation.__elasticsearch__.client.indices.delete index: Conversation.index_name rescue nil
+  # Conversation.__elasticsearch__.client.indices.delete index: Conversation.index_name rescue nil
 
   # Create the new index with the new mapping
-  Conversation.__elasticsearch__.client.indices.create index: Conversation.index_name,
-        body: { settings: Conversation.settings.to_hash, mappings: Conversation.mappings.to_hash }
+  # Conversation.__elasticsearch__.client.indices.create index: Conversation.index_name,
+        # body: { settings: Conversation.settings.to_hash, mappings: Conversation.mappings.to_hash }
 
   # Index all article records from the DB to Elasticsearch
-  Conversation.import
+  # Conversation.import

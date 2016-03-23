@@ -1,0 +1,28 @@
+<h1>Conversation Search</h1>
+
+<%= form_for search_path, method: :get do |f| %>
+  <p>
+    <%= f.label "Search for" %>
+    <%= text_field_tag :q, params[:q] %>
+    <%= submit_tag "Go", name: nil %>
+  </p>
+<% end %>
+
+<ul>
+  <% @conversations.each do |c| %>
+    <li>
+      <h3>
+        State : <%= link_to c.try(:highlight).try(:state) ? 
+                      c.highlight.state[0].html_safe : 
+                      c.state, controller: "conversations", action: "show", id: c._id %>
+      </h3>
+
+      <% if c.try(:highlight).try(:body) %>
+        <% c.highlight.body.each do |snippet| %>
+          <p><%= snippet.html_safe %>...</p>
+        <% end %>
+      <% end %>
+
+    </li>
+  <% end %>
+</ul>

@@ -1,0 +1,12 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+
+development:
+  <<: *default
+  database: elastic_version_development
+
+test:
+  <<: *default
+  database: elastic_version_test

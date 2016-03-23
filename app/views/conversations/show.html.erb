@@ -1,0 +1,50 @@
+<%- model_class = Conversation -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:state) %>:</strong></dt>
+  <dd><%= @conversation.state %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:body) %>:</strong></dt>
+  <dd><%= @conversation.body %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:parent_id) %>:</strong></dt>
+  <dd><%= @conversation.parent_id %></dd>
+</dl>
+
+<table>
+  <% @conversation.versions.order(:id).reverse.each do |cv| %>
+    <% if cv.reify %>
+      <tr>
+        <td>
+          <dl class="dl-horizontal">
+            <dt><strong><%= model_class.human_attribute_name(:created_at) %>:</strong></dt>
+            <dd><%= l cv.created_at %></dd>
+            <dt><strong><%= model_class.human_attribute_name(:state) %>:</strong></dt>
+            <dd><%= cv.reify.state %></dd>
+            <dt><strong><%= model_class.human_attribute_name(:body) %>:</strong></dt>
+            <dd><%= cv.reify.body %></dd>
+            <dt><strong><%= model_class.human_attribute_name(:change_set) %>:</strong></dt>
+            <dd><%= cv.changeset %></dd>
+            <dt><strong><%= model_class.human_attribute_name(:diffs) %>:</strong></dt>
+            <% if cv.previous && cv.previous.reify %>
+              <dd><%= Differ.diff_by_char(cv.reify.body, cv.previous.reify.body).to_s.html_safe %></dd>
+            <% else %>
+              <dd>na</dd>
+            <% end %>
+          </dl>
+        </td>
+      </tr>
+    <% end %>
+  <% end %>
+</table>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              conversations_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_conversation_path(@conversation), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              conversation_path(@conversation),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

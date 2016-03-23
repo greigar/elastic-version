@@ -3,9 +3,10 @@ class ConversationsController < ApplicationController
 
   def search
     if params[:q].nil?
-      @conversations = []
+      @conversations_string = @conversations = []
     else
       @conversations = Conversation.search params[:q]
+      @conversations_string = Conversation.search_string params[:q]
     end
   end
 
